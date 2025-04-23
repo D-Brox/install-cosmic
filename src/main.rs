@@ -90,9 +90,11 @@ async fn main() {
 
     let file = tempdir.join("libdisplay-info1.deb");
     urls.push(file.to_str().unwrap().to_string());
+    let req = get(format!("https://launchpad.net/ubuntu/+archive/primary/+files/libdisplay-info1_0.1.1-2build1_{arch}.deb"));
+    let client = surf::client().with(surf::middleware::Redirect::new(5));
     std::fs::write(
         file,
-        get(format!("https://launchpad.net/ubuntu/+archive/primary/+files/libdisplay-info1_0.1.1-2build1_{arch}.deb"))
+        client.send(req)
         .await
         .expect("Failed to get deb")
         .body_bytes()
