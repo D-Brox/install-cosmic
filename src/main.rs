@@ -62,13 +62,13 @@ async fn main() {
 
     let packages = Packages::from(&data);
     let tempdir = TempDir::new("install_cosmic").expect("Failed to create tempdir");
-    let mut urls = vec![];
+    let mut debs = vec![];
     let pb = ProgressBar::new(cosmic_packages.len() as u64);
     pb.inc(0);
     for package in packages {
         if cosmic_packages.contains(package.package.as_str()) {
             let file = tempdir.path().join(format!("{}.deb", package.package));
-            urls.push(file.to_str().unwrap().to_string());
+            debs.push(file.to_str().unwrap().to_string());
             std::fs::write(
                 file,
                 get(format!(
@@ -87,7 +87,7 @@ async fn main() {
     }
 
     let file = tempdir.path().join("libdisplay-info1.deb");
-    urls.push(file.to_str().unwrap().to_string());
+    debs.push(file.to_str().unwrap().to_string());
     let req = get(format!("https://launchpad.net/ubuntu/+archive/primary/+files/libdisplay-info1_0.1.1-2build1_{arch}.deb"));
     let client = surf::client().with(surf::middleware::Redirect::new(5));
     std::fs::write(
@@ -102,7 +102,7 @@ async fn main() {
     )
     .expect("Failed to download deb");
 
-    let cache = new_cache!(&urls).expect("Failed to load apt cache");
+    let cache = new_cache!(&debs).expect("Failed to load apt cache");
 
     for package in [
         "cosmic-session",
