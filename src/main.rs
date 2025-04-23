@@ -1,9 +1,10 @@
 use apt_parser::Packages;
+use indicatif::ProgressBar;
 use rust_apt::{
     new_cache,
     progress::{AcquireProgress, InstallProgress},
 };
-use std::collections::HashSet;
+use std::{collections::HashSet, path::Path};
 use surf::get;
 use tempdir::TempDir;
 
@@ -57,11 +58,16 @@ async fn main() {
         .expect("Failed to read Packages file");
 
     let packages = Packages::from(&data);
-    let tempdir = TempDir::new("install_cosmic").expect("Failed to create tempdir");
+    // let tempdir = TempDir::new("install_cosmic").expect("Failed to create tempdir");
+
+    let tempdir = Path::new("/tmp/install_cosmic");
+    std::fs::create_dir(tempdir).expect("Failed to create dir");
     let mut urls = vec![];
+    let pb = ProgressBar::new(cosmic_packages.len() as u64);
+    pb.inc(0);
     for package in packages {
         if cosmic_packages.contains(package.package.as_str()) {
-            let file = tempdir.path().join(format!("{}.deb", package.package));
+            let file = tempdir.join(format!("{}.deb", package.package));
             urls.push(file.to_str().unwrap().to_string());
             std::fs::write(
                 file,
@@ -76,6 +82,7 @@ async fn main() {
                 .expect("Failed to read deb"),
             )
             .expect("Failed to download deb");
+            pb.inc(1);
         }
     }
 
@@ -85,7 +92,7 @@ async fn main() {
         pkg.mark_install(true, true);
         pkg.protect();
     }
-    if let Err(err) = cache.resolve(false) {
+    if let Err(err) = cache.resolve(true) {
         panic!("Failed to resolve: {err}")
     }
 
