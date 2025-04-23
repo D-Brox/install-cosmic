@@ -11,6 +11,7 @@ use tempdir::TempDir;
 #[tokio::main]
 async fn main() {
     let cosmic_packages = HashSet::from([
+        "appstream-data-pop",
         "cosmic-app-library",
         "cosmic-applets",
         "cosmic-bg",
@@ -35,6 +36,7 @@ async fn main() {
         "cosmic-term",
         "cosmic-wallpapers",
         "cosmic-workspaces",
+        "libdisplay-info1",
         "pop-fonts",
         "pop-icon-theme",
         "pop-launcher",
