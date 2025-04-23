@@ -1,7 +1,9 @@
 [package]
-name = "install_cosmic"
+name = "install-cosmic"
 version = "0.1.0"
 edition = "2021"
+authors = ["D-Brox <davidfbg00@gmail.com>"]
+license-file = "LICENSE"
 
 [dependencies]
 anyhow = "1.0.98"
@@ -9,5 +11,5 @@ apt-parser = "1.0.6"
 indicatif = "0.17.11"
 rust-apt = { git = "https://gitlab.com/volian/rust-apt" }
 surf = "2.3.2"
-tempdir = "0.3.7"
+tempfile = "3.19.1"
 tokio = { version = "1.44.2", features = ["macros", "rt", "rt-multi-thread"] }

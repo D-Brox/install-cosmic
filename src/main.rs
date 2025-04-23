@@ -1,12 +1,14 @@
+use std::collections::HashSet;
+
 use apt_parser::Packages;
-use indicatif::ProgressBar;
 use rust_apt::{
     new_cache,
     progress::{AcquireProgress, InstallProgress},
 };
-use std::{collections::HashSet, path::Path};
+
+use indicatif::ProgressBar;
 use surf::get;
-use tempdir::TempDir;
+use tempfile::Builder;
 
 #[tokio::main]
 async fn main() {
@@ -61,7 +63,10 @@ async fn main() {
         .expect("Failed to read Packages file");
 
     let packages = Packages::from(&data);
-    let tempdir = TempDir::new("install_cosmic").expect("Failed to create tempdir");
+    let tempdir = Builder::new()
+        .prefix("install_cosmic")
+        .tempdir()
+        .expect("Failed to create tempdir");
     let mut debs = vec![];
     let pb = ProgressBar::new(cosmic_packages.len() as u64);
     pb.inc(0);
