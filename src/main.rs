@@ -9,7 +9,7 @@ use tempdir::TempDir;
 
 #[tokio::main]
 async fn main() {
-    let mut cosmic_packages = HashSet::from([
+    let cosmic_packages = HashSet::from([
         "cosmic-app-library",
         "cosmic-applets",
         "cosmic-bg",
@@ -40,7 +40,16 @@ async fn main() {
         "pop-sound-theme",
         "xdg-desktop-portal-cosmic",
     ]);
-    let data = get("https://apt-origin.pop-os.org/release/dists/noble/main/binary-amd64/Packages")
+
+    let url = if cfg!(target_arch = "x86_64") {
+        "https://apt-origin.pop-os.org/release/dists/noble/main/binary-amd64/Packages"
+    } else if cfg!(target_arch = "aarch64") {
+        "https://apt-origin.pop-os.org/release/dists/noble/main/binary-arm64/Packages"
+    } else {
+        panic!("Architecture not suported");
+    };
+
+    let data = get(url)
         .await
         .expect("Failed to get Packages file")
         .body_string()
@@ -65,7 +74,8 @@ async fn main() {
                 .body_bytes()
                 .await
                 .expect("Failed to read deb"),
-            ).expect("Failed to download deb");
+            )
+            .expect("Failed to download deb");
         }
     }
 
