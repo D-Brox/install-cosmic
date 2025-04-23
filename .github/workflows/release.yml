@@ -43,7 +43,7 @@ jobs:
         id: package
         run: |
           cargo deb
-          echo $ARCH=./target/debian/*.deb >> $GITHUB_OUTPUT
+          echo `uname -m`=./target/debian/*.deb >> $GITHUB_OUTPUT
       - name: Publish artifacts and release
         uses: softprops/action-gh-release@v2
         with:
