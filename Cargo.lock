@@ -1552,8 +1552,7 @@ dependencies = [
 [[package]]
 name = "rust-apt"
 version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "89d78ef02335b0d12dff96f742b2124f371922d3efbedbcba5703025bb0e37a6"
+source = "git+https://gitlab.com/volian/rust-apt#9e764f17686d2c0ca9ebfda27e8db92f0360ad50"
 dependencies = [
  "cxx",
  "cxx-build",
