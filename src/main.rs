@@ -36,7 +36,6 @@ async fn main() {
         "cosmic-term",
         "cosmic-wallpapers",
         "cosmic-workspaces",
-        "libdisplay-info1",
         "pop-fonts",
         "pop-icon-theme",
         "pop-launcher",
@@ -44,13 +43,14 @@ async fn main() {
         "xdg-desktop-portal-cosmic",
     ]);
 
-    let url = if cfg!(target_arch = "x86_64") {
-        "https://apt-origin.pop-os.org/release/dists/noble/main/binary-amd64/Packages"
+    let arch= if cfg!(target_arch = "x86_64") {
+        "amd64"
     } else if cfg!(target_arch = "aarch64") {
-        "https://apt-origin.pop-os.org/release/dists/noble/main/binary-arm64/Packages"
+        "arm64"
     } else {
         panic!("Architecture not suported");
     };
+    let url = format!("https://apt-origin.pop-os.org/release/dists/noble/main/binary-{arch}/Packages");
 
     let data = get(url)
         .await
@@ -88,7 +88,24 @@ async fn main() {
         }
     }
 
+    let file = tempdir.join("libdisplay-info1.deb");
+    urls.push(file.to_str().unwrap().to_string());
+    std::fs::write(
+        file,
+        get(format!("https://launchpad.net/ubuntu/+archive/primary/+files/libdisplay-info1_0.1.1-2build1_{arch}.deb"))
+        .await
+        .expect("Failed to get deb")
+        .body_bytes()
+        .await
+        .expect("Failed to read deb"),
+    )
+    .expect("Failed to download deb");
+
     let cache = new_cache!(&urls).expect("Failed to load apt cache");
+    let pkg = cache.get("libdisplay-info1").expect("Failed to get package");
+    pkg.mark_install(true, true);
+    pkg.protect();
+
     for package in cosmic_packages {
         let pkg = cache.get(&package).expect("Failed to get package");
         pkg.mark_install(true, true);
